@@ -1,0 +1,11 @@
+<!--
+  Launch file
+-->
+
+<launch>
+  <group ns="rs_odom_fix" >
+    <node pkg="rs_odom_fix" type="tf_to_odom_v6.py" name="tf_to_odom" />
+    <node pkg="rs_odom_fix" type="tf_broadcaster.py" name="tf_broadcaster" />
+  </group>
+</launch>
+
