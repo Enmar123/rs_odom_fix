@@ -67,14 +67,14 @@ if __name__ == '__main__':
                                 0.0, 0.0, 0.0, 0.0, 0.0001, 0.0,
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001]
                                 
-    odom_msg.header.frame_id = "odom"
+    odom_msg.header.frame_id = "ekf_odom"
     odom_msg.child_frame_id = "base_link"
 
     time.sleep(0.1) # allows listener buffer to load
     rate = rospy.Rate(50)
     while not rospy.is_shutdown():
         try:
-            (trans,rot) = listener.lookupTransform('/camera_odom_frame', '/fake_base_link', rospy.Time(0))
+            (trans,rot) = listener.lookupTransform('/rst265_camera_odom_frame', '/fake_base_link', rospy.Time(0))
 
             
             odom_msg.pose.pose.position.x = trans[0]
