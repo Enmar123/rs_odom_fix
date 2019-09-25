@@ -68,7 +68,7 @@ if __name__ == '__main__':
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001]
                                 
     odom_msg.header.frame_id = "ekf_odom"
-    odom_msg.child_frame_id = "base_link"
+    odom_msg.child_frame_id = "rs_base_link"
 
     time.sleep(0.1) # allows listener buffer to load
     rate = rospy.Rate(50)
