@@ -4,7 +4,7 @@
 import rospy
 import tf
 from nav_msgs.msg import Odometry
-import time
+#import time
 
 def callback(rs_odom):
     
@@ -24,9 +24,12 @@ if __name__ == '__main__':
     
     listener = tf.TransformListener()
     odom_sub = rospy.Subscriber("/rst265_camera/odom/sample", Odometry, callback)
-    pose_pub = rospy.Publisher("/rs_t265_odom", Odometry , queue_size=10)
+    odom_pub = rospy.Publisher("/rs_t265_odom", Odometry , queue_size=10)
         
     odom_msg = Odometry()
+    
+    odom_msg.header.frame_id = "ekf_odom"
+    odom_msg.child_frame_id = "rs_base_link"
     
     odom_msg.pose.covariance = [0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
                                 0.0, 0.01, 0.0, 0.0, 0.0, 0.0,
@@ -42,16 +45,15 @@ if __name__ == '__main__':
                                 0.0, 0.0, 0.0, 0.0, 0.0001, 0.0,
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001]
                                 
-    odom_msg.header.frame_id = "ekf_odom"
-    odom_msg.child_frame_id = "rs_base_link"
-
-    time.sleep(0.1) # allows listener buffer to load
+    #time.sleep(0.1) # allows listener buffer to load
     rate = rospy.Rate(50)
-    while not rospy.is_shutdown():
-        try:
-            (trans,rot) = listener.lookupTransform('/rst265_camera_odom_frame', '/fake_base_link', rospy.Time(0))
-
-            
+    try:
+        while not rospy.is_shutdown():
+            try:
+                (trans,rot) = listener.lookupTransform('/rst265_camera_odom_frame', '/fake_base_link', rospy.Time(0))
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                continue
+                
             odom_msg.pose.pose.position.x = trans[0]
             odom_msg.pose.pose.position.y = trans[1]
             odom_msg.pose.pose.position.z = trans[2]
@@ -67,15 +69,13 @@ if __name__ == '__main__':
             odom_msg.twist.twist.angular.y = ay
             odom_msg.twist.twist.angular.z = az
             
-            
             now  = rospy.get_rostime()
             odom_msg.header.stamp.secs = now.secs
             odom_msg.header.stamp.nsecs = now.nsecs
             
+            odom_pub.publish(odom_msg)            
+                
+            rate.sleep()
             
-            pose_pub.publish(odom_msg)            
-            
-        except (tf.LookupException, tf.ConnectivityException):
-            continue
-    
-        rate.sleep()
+    except rospy.ROSInterruptException:
+        pass
