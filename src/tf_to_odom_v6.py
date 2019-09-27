@@ -45,7 +45,18 @@ if __name__ == '__main__':
                                 0.0, 0.0, 0.0, 0.0, 0.0001, 0.0,
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001]
                                 
-    #time.sleep(0.1) # allows listener buffer to load
+    while not rospy.is_shutdown():   
+        try:    
+            rospy.loginfo("odom info recieved %s"%(str([[lx,ly,lz],[ax,ay,az]])))
+            rospy.loginfo("beginning odometry transformation")
+        except NameError:
+            continue
+        else:
+            break
+    
+    #lx, ly, lz, ax, ay, az = (0,0,0,0,0,0)
+                                
+    #time.sleep(0.1) # allows listener buffer to load + callback variables
     rate = rospy.Rate(50)
     try:
         while not rospy.is_shutdown():
